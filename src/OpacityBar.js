@@ -1,0 +1,43 @@
+import CanvasComponentBase from './CanvasComponentBase'
+import { RGBA } from 'react-color-class'
+
+const styles = {
+  root: {
+    display:'flex',
+    position:'relative',
+    minWidth: 20,
+  }
+}
+
+export default class OpacityBar extends CanvasComponentBase {
+
+  drawCanvas(){
+    let {width, height} = this.refs.canvas;
+    let ctx = this.refs.canvas.getContext('2d')
+    ctx.clearRect(0,0,width,height)
+
+    let grad = ctx.createLinearGradient(0,0,0,height)
+    grad.addColorStop(0,'transparent');
+    grad.addColorStop(1,this.props.colorRGBA.toRGB().toString())
+    ctx.fillStyle = grad
+    ctx.fillRect(4,4,width-8,height-8);
+
+    let y = 4 + this.props.colorRGBA.getA()*(height-8)/255
+    ctx.strokeStyle = RGBA.Black
+    ctx.strokeWidth = 1
+    ctx.strokeRect(0,y-1.5,width,3)
+    ctx.strokeRect(4,4,width-8,height-8)
+  }
+
+  onChange(e){
+    let canvas = this.refs.canvas;
+    let bbox = canvas.getBoundingClientRect();
+    this.props.colorRGBA.setA(255*(e.clientY-bbox.top)/(canvas.height-8));
+    this.props.onChange && this.props.onChange()
+  }
+
+  render(){
+    return super.render(styles.root)
+  }
+
+}
